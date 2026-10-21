@@ -1,0 +1,1 @@
+DSHMap.receive("versions",null,[{"id":"latest","version":"0.2.1-rc.2","commit":"687f282e8625c6b8d11ff58211a90524be2e4317","date":"2026-10-17T15:22:43+08:00","generatedAt":"2026-10-19T23:35:10.625Z","path":"data","light":false}]);

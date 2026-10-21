@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="uk" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DSH</title>
+  <!-- title, description and the spinner text are filled by assets/js/i18n.js -->
+  <meta name="description" content="">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/app.css?v=2026-10-19T23%3A35%3A10.625Z">
+  <link rel="stylesheet" id="hljs-theme" href="vendor/hljs-dark.min.css">
+  <script>
+    // Apply the saved theme before first paint.
+    try {
+      var saved = JSON.parse(localStorage.getItem('dshmap:theme'))
+      document.documentElement.dataset.theme = saved || (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+    } catch (e) { /* storage unavailable: keep the default theme */ }
+  </script>
+  <script>
+    // Data scripts may run before assets/js/boot.js: queue their calls (UI/UX roadmap 4.1).
+    window.DSHMap = { queue: [], receive: function () { this.queue.push([].slice.call(arguments)) } }
+  </script>
+  <script src="data/versions.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script>
+    // Start downloading the core of the selected data version (?version=<id>) right away,
+    // in parallel with the app scripts; boot.js picks up whatever arrived first.
+    DSHMap.loadMain = function (stamp) {
+      var id = null, list = [], dir = 'data'
+      try { id = new URLSearchParams(location.search).get('version') } catch (e) { /* no search params: latest */ }
+      for (var i = 0; i < this.queue.length; i++) if (this.queue[i][0] === 'versions') list = this.queue[i][2] || []
+      for (var j = 0; j < list.length; j++) if (list[j].id === id) dir = list[j].path
+      var boot = this.boot = { src: dir + '/dsh-data.js', state: 'loading' }
+      var s = document.createElement('script')
+      s.src = boot.src + '?v=' + stamp
+      s.onload = function () { boot.state = 'loaded'; window.DSHMap.emit && window.DSHMap.emit('data-core-script') }
+      s.onerror = function () { boot.state = 'failed'; window.DSHMap.emit && window.DSHMap.emit('data-core-script') }
+      document.head.appendChild(s)
+    }
+    DSHMap.loadMain('2026-10-19T23%3A35%3A10.625Z')
+  </script>
+</head>
+<body>
+  <div id="app">
+    <div class="loading" style="height:100vh" role="status"><div class="spinner"></div><span id="boot-text"></span></div>
+  </div>
+  <noscript><p style="padding:40px;font-family:sans-serif">Для карти потрібен JavaScript. · The map needs JavaScript.</p></noscript>
+
+  <!-- application: deferred; views, layouts and vendored libraries load on first use (assets/js/ui.js) -->
+  <script defer src="assets/js/boot.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script defer src="assets/js/a11y.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script defer src="assets/js/i18n.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script defer src="assets/js/model.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script defer src="assets/js/ui.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script defer src="assets/js/components.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script defer src="assets/js/guide.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script defer src="assets/js/tour.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script defer src="assets/js/detail.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script defer src="assets/js/viewer.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script defer src="assets/js/views/start.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+  <script defer src="assets/js/main.js?v=2026-10-19T23%3A35%3A10.625Z"></script>
+</body>
+</html>

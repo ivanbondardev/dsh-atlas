@@ -1,0 +1,1 @@
+DSHMap.receive("doc","docs/user/index.md",{"body":"---\nlayout: false\nhead:\n  - - meta\n    - http-equiv: refresh\n      content: 0; url=./guide/quickstart\n---\n\n# DeepSeek Harness\n\nEnglish | [中文](index.zh.md)\n"});
