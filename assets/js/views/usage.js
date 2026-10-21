@@ -713,14 +713,8 @@
     })
   }
 
-  /** Inline Markdown subset of curated text: `code` spans only. */
-  function mdInline(text) {
-    const out = []
-    String(text ?? '').split(/(`[^`]+`)/).forEach(part => out.push(part.startsWith('`') && part.endsWith('`') ? h('code', null, part.slice(1, -1)) : part))
-    return h('span', null, out)
-  }
+  const mdInline = DSHMap.ui.mdInline
 
   function stat(v, label) { return h('div', { class: 'stat' }, h('b', null, v), h('span', null, label)) }
 
-  DSHMap.ui.mdInline = mdInline
 })()

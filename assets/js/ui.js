@@ -1210,6 +1210,12 @@
       if (window.hljs) run()
       else DSHMap.vendor.need(['hljs']).then(run, () => { /* stays plain */ })
     },
+    /** Inline Markdown subset of curated text: `code` spans only. */
+    mdInline(text) {
+      const out = []
+      String(text ?? '').split(/(`[^`]+`)/).forEach(part => out.push(part.startsWith('`') && part.endsWith('`') ? h('code', null, part.slice(1, -1)) : part))
+      return h('span', null, out)
+    },
     /** Markdown → sanitized element; relative links resolve against baseDir. */
     markdown(md, baseDir) {
       const el = h('div', { class: 'md' })
