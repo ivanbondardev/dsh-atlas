@@ -719,7 +719,7 @@ details.fold > .fold-body { padding: 0 var(--sp-3) var(--sp-3); }
 .tooltip .tt-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--sw); }
 .tooltip .tt-gap { margin-top: var(--sp-1); }
 /* Edge kinds as swatch colors (side panel and graph legend). */
-.ek-peer { --sw: var(--edge-peer); }
+.ek-peer { --sw: var(--edge-runtime); }
 .ek-runtime { --sw: var(--edge-runtime); }
 .ek-dev { --sw: var(--edge-dev); }
 .ek-optional { --sw: var(--edge-optional); }
@@ -745,6 +745,12 @@ details.fold > .fold-body { padding: 0 var(--sp-3) var(--sp-3); }
 .gl-list li { display: flex; align-items: center; gap: var(--sp-2); line-height: 1.3; }
 .gl-list li.off { opacity: .45; }
 .gl-list .gl-note { color: var(--text-faint); font-size: var(--fs-xs); }
+.gl-shapes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+.gl-shape { display: inline-flex; width: 14px; height: 14px; flex: 0 0 14px; color: var(--text-dim); }
+.gl-shape svg { width: 100%; height: 100%; }
+.gl-details { margin-top: var(--sp-2); }
+.gl-details summary { cursor: pointer; padding: var(--sp-1) 0; }
+.gl-details summary:hover { color: var(--text); }
 .gl-dot { width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; background: var(--sw); }
 .gl-line { width: 18px; height: 3px; flex: 0 0 18px; border-radius: var(--r-sm); background: var(--sw); color: var(--sw); }
 .gl-line.dashed { background: repeating-linear-gradient(90deg, currentColor 0 4px, transparent 4px 7px); }

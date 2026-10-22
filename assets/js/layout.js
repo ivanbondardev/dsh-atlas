@@ -175,7 +175,7 @@
    * @returns {{ pos: Map<string, { x: number, y: number }>, labels: { layer: object, x: number, y: number }[] }}
    */
   function layered(input) {
-    const CELL = 64, GAPX = 70, GAPY = 80, MAXW = 4400
+    const CELL = Math.max(64, ...input.groups.flatMap(g => g.packages.map(id => (input.size?.(id) ?? 40) + 28))), GAPX = 70, GAPY = 80, MAXW = 4400
     const pos = new Map()
     const labels = []
     let y = 0
@@ -199,5 +199,55 @@
     return { pos, labels }
   }
 
-  return { twoLevel, mulberry32, groupCenters, layered }
+  // Separate square node bounds (safe for every silhouette), then group bounds.
+  // Works on saved layouts too, whose coordinates may use a different size metric.
+  function separate(nodes, positions) {
+    const groups = new Map()
+    for (const n of nodes) {
+      const p = positions.get(n.id)
+      if (!p) continue
+      if (!groups.has(n.group)) groups.set(n.group, [])
+      groups.get(n.group).push({ id: n.id, x: p.x, y: p.y, w: n.size + 24, h: n.size + 24 })
+    }
+    function pack(boxes) {
+      for (let step = 0; step < 500; step++) {
+        let moved = false
+        for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+          const a = boxes[i], b = boxes[j]
+          const dx = (a.w + b.w) / 2 - Math.abs(a.x - b.x)
+          const dy = (a.h + b.h) / 2 - Math.abs(a.y - b.y)
+          if (dx <= 0 || dy <= 0) continue
+          moved = true
+          const axis = dx < dy ? 'x' : 'y'
+          const shift = ((axis === 'x' ? dx : dy) + 0.1) / 2
+          const sign = a[axis] <= b[axis] ? -1 : 1
+          a[axis] += sign * shift; b[axis] -= sign * shift
+        }
+        if (!moved) return
+      }
+      // Deterministic safe fallback for pathological coincident inputs.
+      const x = boxes.reduce((s, b) => s + b.x, 0) / boxes.length
+      const y = boxes.reduce((s, b) => s + b.y, 0) / boxes.length
+      const cols = Math.ceil(Math.sqrt(boxes.length))
+      const w = Math.max(...boxes.map(b => b.w)) + 1
+      const h = Math.max(...boxes.map(b => b.h)) + 1
+      boxes.forEach((b, i) => { b.x = x + (i % cols) * w; b.y = y + Math.floor(i / cols) * h })
+    }
+    const bounds = []
+    for (const members of groups.values()) {
+      pack(members)
+      const x1 = Math.min(...members.map(n => n.x - n.w / 2))
+      const x2 = Math.max(...members.map(n => n.x + n.w / 2))
+      const y1 = Math.min(...members.map(n => n.y - n.h / 2))
+      const y2 = Math.max(...members.map(n => n.y + n.h / 2))
+      const x = (x1 + x2) / 2, y = (y1 + y2) / 2
+      bounds.push({ x, y, ox: x, oy: y, w: x2 - x1 + 48, h: y2 - y1 + 80, members })
+    }
+    pack(bounds)
+    const out = new Map()
+    for (const b of bounds) for (const n of b.members) out.set(n.id, { x: n.x + b.x - b.ox, y: n.y + b.y - b.oy })
+    return out
+  }
+
+  return { twoLevel, mulberry32, groupCenters, layered, separate }
 })

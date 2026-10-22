@@ -3,15 +3,15 @@
   'use strict'
   const { h, clear, svgIcon, t, fmt, util, i18n } = DSHMap
 
-  // v2 (roadmap 1.3): start on the web profile in Groups mode with packages
-  // no standard profile loads hidden; older saved states get these defaults once.
+  // v3: size by dependents; migrate the previous default once.
+  // Keep the web profile and hide packages no standard profile loads.
   const DEFAULTS = {
-    v: 2,
+    v: 3,
     mode: 'groups',
     layout: 'force',
     edges: { peer: true, runtime: true, dev: false, optional: false, svc: false, evt: false },
     color: 'layer',
-    size: 'lines',
+    size: 'dependents',
     profile: 'web',
     hideUnloaded: true,
     cutFocus: '',
@@ -25,7 +25,8 @@
     depth: 1,
   }
   const saved = util.storage.get('map', {})
-  if (saved.v !== DEFAULTS.v) { delete saved.mode; delete saved.profile; saved.edges = { ...(saved.edges ?? {}), dev: false } }
+  if ((saved.v ?? 0) < 2) { delete saved.mode; delete saved.profile; saved.edges = { ...(saved.edges ?? {}), dev: false } }
+  if ((saved.v ?? 0) < 3) delete saved.size
   const state = { ...DEFAULTS, ...saved, v: DEFAULTS.v, edges: { ...DEFAULTS.edges, ...(saved.edges ?? {}) } }
   /** Save the state as the next default and mirror it into the route. */
   const persist = () => { util.storage.set('map', state); writeUrl() }
@@ -47,7 +48,7 @@
   // Groups overview draws only its backbone (links with MAJOR_LINKS+ package
   // dependencies, plus the strongest BACKBONE_PER_GROUP links of every group).
   // Package labels appear from PKG_LABEL_ZOOM; group labels scale to stay readable.
-  const LOD_ZOOM = 0.6
+  const LOD_ZOOM = 1.1
   const PKG_LABEL_ZOOM = 0.75
   const MAJOR_LINKS = 6
   const BACKBONE_PER_GROUP = 2
@@ -372,15 +373,10 @@
         h('label', { class: 'check check-gap' }, h('input', { type: 'checkbox', checked: state.hideExp, onchange: e => { state.hideExp = e.target.checked; persist(); this.applyVisibility() } }), t('map.hide.exp')),
         h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: state.hideTest, onchange: e => { state.hideTest = e.target.checked; persist(); this.applyVisibility() } }), t('map.hide.test')))
 
-      // shapes legend
-      const shape = (svgInner) => h('span', { html: `<svg viewBox="0 0 14 14">${svgInner}</svg>` }).firstChild
+      // Keep the sidebar and graph key consistent with package silhouettes.
       side.append(h('h5', null, t('map.shapes')), h('div', { class: 'shape-legend' },
-        h('div', null, shape('<circle cx="7" cy="7" r="5.5" fill="currentColor" opacity=".7"/>'), t('map.shape.function')),
-        h('div', null, shape('<circle cx="7" cy="7" r="5" fill="currentColor" opacity=".7" stroke="currentColor" stroke-width="1.6" stroke-dasharray="0"/><circle cx="7" cy="7" r="2" fill="var(--panel)"/>'), t('map.shape.service')),
-        h('div', null, shape('<rect x="1.5" y="2.5" width="11" height="9" rx="2.5" fill="currentColor" opacity=".7"/>'), t('map.shape.library')),
-        h('div', null, shape('<polygon points="7,1 12.5,4 12.5,10 7,13 1.5,10 1.5,4" fill="currentColor" opacity=".7"/>'), t('map.shape.bundle')),
-        h('div', null, shape('<polygon points="7,1 8.8,5 13,5.3 9.8,8.2 10.8,12.6 7,10.3 3.2,12.6 4.2,8.2 1,5.3 5.2,5" fill="currentColor" opacity=".7"/>'), t('map.shape.app')),
-        h('div', null, shape('<circle cx="7" cy="7" r="5" fill="currentColor" opacity=".45" stroke="var(--text)" stroke-width="2"/>'), t('map.shape.owner'))))
+        SHAPES.map(([id]) => h('div', null, shapeIcon(id), t(`map.shape.${id}`))),
+        h('div', null, shapeIcon('owner'), t('map.shape.owner'))))
 
       // layers & groups legend
       side.appendChild(h('h5', { title: i18n.pick(M.vocab.layersNote) }, t('map.legend'), h('span', { class: 'faint h5-note' }, ` · ${t('interpretation')}`), h('button', { onclick: () => { state.hiddenGroups = []; state.hiddenLayers = []; persist(); this.renderSide(); this.applyVisibility() } }, t('show.all'))))
@@ -421,7 +417,8 @@
         els.push({ group: 'nodes', data: { id: `g:${g.id}`, label: g.id, gid: g.id, color: M.groupColor(g.id) }, classes: 'grp' })
       }
       for (const p of M.packages) {
-        const shape = p.kinds.includes('app') ? 'star' : p.kinds.includes('bundle') ? 'hexagon' : p.form ? 'ellipse' : 'round-rectangle'
+        const role = seamRole(p)
+        const shape = role === 'definition' ? 'diamond' : role === 'provider' ? 'triangle' : p.kinds.includes('app') ? 'star' : p.kinds.includes('bundle') ? 'hexagon' : p.form ? 'ellipse' : 'round-rectangle'
         const cls = ['pkg']
         if (p.kinds.includes('experimental')) cls.push('exp')
         if (p.services.owns.length) cls.push('owner')
@@ -526,13 +523,18 @@
       const cy = this.cy
       if (!cy) return
       const overview = !this.focusRef && !this.highlight && cy.zoom() < LOD_ZOOM
-      const key = `${state.mode}:${overview}`
+      const neighbourhood = !this.focusRef && !this.highlight && !overview && cy.zoom() < 1.8
+      const key = `${state.mode}:${overview}:${neighbourhood}`
       if (key === this.lodKey) return
       this.lodKey = key
       cy.batch(() => {
         cy.edges('.lod').removeClass('lod')
         if (state.mode === 'groups') { if (overview) cy.edges('.gedge.minor').addClass('lod') }
-        else cy.edges(overview ? '.dep' : '.pgedge').addClass('lod')
+        else {
+          cy.edges(overview ? '.dep' : '.pgedge').addClass('lod')
+          if (overview) cy.edges('.pgedge.minor').addClass('lod')
+          cy.edges('.dep').toggleClass('distant', neighbourhood)
+        }
       })
     },
 
@@ -551,23 +553,24 @@
         { selector: 'node.grp', style: { 'shape': 'round-rectangle', 'background-color': 'data(color)', 'background-opacity': dark ? 0.07 : 0.06, 'border-width': 1.2, 'border-color': 'data(color)', 'border-opacity': 0.45, 'padding': 14, 'label': 'data(label)', 'text-valign': 'top', 'text-halign': 'center', 'text-margin-y': -4, 'font-size': grpFs, 'font-weight': 700, 'color': 'data(color)', 'text-outline-width': 2.5 * grpFs / 15, 'min-zoomed-font-size': 6, 'z-index': 1, 'corner-radius': 14 } },
         { selector: 'node.gov', style: { 'shape': 'round-rectangle', 'width': 'data(size)', 'height': 'data(size)', 'background-color': 'data(color)', 'background-opacity': 0.85, 'label': 'data(label)', 'text-valign': 'bottom', 'text-halign': 'center', 'text-margin-y': 5, 'font-size': govFs, 'text-outline-width': 2.2 * govFs / 14, 'font-weight': 700, 'border-width': 2, 'border-color': dark ? 'rgba(255,255,255,.25)' : 'rgba(0,0,0,.12)', 'corner-radius': 12, 'min-zoomed-font-size': 6 } },
         { selector: 'node.layer-label', style: { 'shape': 'rectangle', 'width': 1, 'height': 1, 'background-opacity': 0, 'label': 'data(label)', 'font-size': 56, 'font-weight': 800, 'color': 'data(color)', 'text-halign': 'right', 'text-valign': 'center', 'text-outline-width': 0, 'events': 'no', 'min-zoomed-font-size': 4 } },
-        { selector: 'edge', style: { 'width': 1, 'line-color': EDGE_COLORS.runtime, 'curve-style': 'straight', 'target-arrow-shape': 'triangle', 'target-arrow-color': EDGE_COLORS.runtime, 'arrow-scale': 0.65, 'opacity': dark ? 0.16 : 0.22, 'z-index': 2 } },
-        { selector: 'edge.peer', style: { 'line-color': EDGE_COLORS.peer, 'target-arrow-color': EDGE_COLORS.peer, 'width': 1.15 } },
+        { selector: 'edge', style: { 'width': 1, 'line-color': EDGE_COLORS.runtime, 'curve-style': 'bezier', 'control-point-step-size': 32, 'target-arrow-shape': 'triangle', 'target-arrow-color': EDGE_COLORS.runtime, 'arrow-scale': 0.65, 'opacity': dark ? 0.16 : 0.22, 'z-index': 2 } },
+        { selector: 'edge.peer', style: { 'width': 1.15 } },
         { selector: 'edge.dev', style: { 'line-style': 'dashed', 'line-dash-pattern': [4, 3], 'opacity': dark ? 0.1 : 0.14 } },
         { selector: 'edge.optional', style: { 'line-color': EDGE_COLORS.optional, 'target-arrow-color': EDGE_COLORS.optional, 'line-style': 'dotted' } },
         { selector: 'edge.svc', style: { 'line-color': EDGE_COLORS.svc, 'target-arrow-color': EDGE_COLORS.svc, 'width': 1.4, 'line-style': 'dashed', 'line-dash-pattern': [6, 3], 'curve-style': 'bezier', 'control-point-step-size': 16, 'opacity': dark ? 0.42 : 0.5 } },
         { selector: 'edge.evt', style: { 'line-color': EDGE_COLORS.evt, 'target-arrow-color': EDGE_COLORS.evt, 'width': 'mapData(n, 1, 12, 1, 3.5)', 'curve-style': 'bezier', 'control-point-step-size': 16, 'opacity': dark ? 0.42 : 0.5 } },
         // aggregated links (3.7): width and opacity grow with the number of package dependencies
         { selector: 'edge.gedge, edge.pgedge', style: { 'width': 'data(w)', 'line-color': faint, 'target-arrow-color': faint, 'opacity': dark ? 'mapData(n, 1, 40, 0.22, 0.6)' : 'mapData(n, 1, 40, 0.26, 0.7)', 'curve-style': 'bezier', 'arrow-scale': 0.9 } },
+        { selector: 'edge.distant.cross', style: { 'opacity': 0.035, 'events': 'no' } },
         // focus states
         { selector: '.faded', style: { 'opacity': dark ? 0.1 : 0.13 } },
-        { selector: 'edge.faded', style: { 'opacity': dark ? 0.03 : 0.04 } },
+        { selector: 'edge.faded', style: { 'opacity': 0, 'events': 'no' } },
         { selector: '.dimprof', style: { 'opacity': dark ? 0.12 : 0.15 } },
         { selector: 'node.pkg.dimcut', style: { 'opacity': dark ? 0.1 : 0.13 } },
         { selector: 'edge.dimcut', style: { 'opacity': dark ? 0.03 : 0.05 } },
         // hover (3.7): everything but the hovered node and its neighbours fades
         { selector: 'node.hover-dim', style: { 'opacity': dark ? 0.16 : 0.2 } },
-        { selector: 'edge.hover-dim', style: { 'opacity': dark ? 0.04 : 0.06 } },
+        { selector: 'edge.hover-dim', style: { 'opacity': 0.015, 'events': 'no' } },
         // level of detail (3.7): edges kept out of the current zoom level
         { selector: 'edge.lod', style: { 'opacity': 0, 'events': 'no' } },
         { selector: 'node.pkg.profdep', style: { 'border-style': 'dashed', 'border-width': 2.6, 'border-color': css('--ok'), 'background-opacity': 0.55 } },
@@ -583,6 +586,8 @@
         { selector: 'node.match', style: { 'border-width': 4, 'border-color': css('--warn'), 'opacity': 1, 'font-size': 12, 'font-weight': 700, 'z-index': 28 } },
         { selector: 'node.hover', style: { 'border-width': 3, 'border-color': text } },
         { selector: 'edge.hover', style: { 'events': 'yes', 'opacity': 0.85, 'width': 1.8, 'z-index': 39 } },
+        { selector: 'edge.hover-out', style: { 'line-color': css('--accent'), 'target-arrow-color': css('--accent') } },
+        { selector: 'edge.hover-in', style: { 'line-color': css('--orange'), 'target-arrow-color': css('--orange') } },
         // aggregated links keep their strength-encoding width when highlighted
         { selector: 'edge.gedge.hover, edge.gedge.e-out', style: { 'width': 'data(w)' } },
         { selector: 'node.peek', style: { 'opacity': 1 } },
@@ -610,7 +615,7 @@
     placeGroupNodes() {
       const cy = this.cy
       const M = DSHMap.model
-      const centers = DSHMap.layout.groupCenters(M.packages.map(p => ({ id: p.id, group: p.group, size: p.size })), this.positions ?? this.forcePositions)
+      const centers = DSHMap.layout.groupCenters(M.packages.map(p => ({ id: p.id, group: p.group, size: packageSize(p) })), this.positions ?? this.forcePositions)
       for (const [gid, c] of centers) cy.$id(`go:${gid}`).position(c)
     },
     applyLayout(animate) {
@@ -623,14 +628,14 @@
         positions = pos
         cy.add(labels.map(l => ({ group: 'nodes', data: { id: `ll:${l.layer.id}`, label: i18n.pick(l.layer.title), color: l.layer.color }, position: { x: l.x, y: l.y }, classes: 'layer-label' })))
       } else {
-        positions = this.forcePositions
+        positions = DSHMap.layout.separate(layoutNodes(), this.forcePositions)
       }
       this.positions = positions
       const nodes = cy.nodes('.pkg')
       if (animate) {
         nodes.forEach(n => { const p = positions.get(n.id()); if (p) n.animate({ position: p }, { duration: dur(650), easing: 'ease-in-out-cubic' }) })
         if (state.mode === 'groups') {
-          const centers = DSHMap.layout.groupCenters(DSHMap.model.packages.map(p => ({ id: p.id, group: p.group, size: p.size })), positions)
+          const centers = DSHMap.layout.groupCenters(DSHMap.model.packages.map(p => ({ id: p.id, group: p.group, size: packageSize(p) })), positions)
           for (const [gid, c] of centers) cy.$id(`go:${gid}`).animate({ position: c }, { duration: dur(650), easing: 'ease-in-out-cubic' })
         }
         setTimeout(() => cy.animate({ fit: { eles: cy.elements(':visible'), padding: 40 } }, { duration: dur(400) }), 680)
@@ -650,7 +655,7 @@
     runLayout(animate = true, seed, sync = false) {
       const M = DSHMap.model
       if (state.layout !== 'force') { state.layout = 'force'; persist(); this.renderSide() }
-      const nodes = M.packages.map(p => ({ id: p.id, group: p.group, size: p.size }))
+      const nodes = M.packages.map(p => ({ id: p.id, group: p.group, size: packageSize(p) }))
       const edges = M.edges.filter(e => e.type === 'peer' || e.type === 'runtime').map(e => ({ source: e.s, target: e.t }))
       const input = { nodes, edges, groups: M.groups.map(g => ({ id: g.id, layer: g.layer })), layerOrder: M.layers.map(l => l.id), seed: seed ?? Math.floor(Math.random() * 1e9) }
       if (sync) {
@@ -769,19 +774,18 @@
         h('button', { class: 'gl-toggle', 'aria-expanded': String(this.legendOpen), 'aria-controls': 'map-key', onclick: () => this.toggleLegend() },
           svgIcon('layers'), h('span', null, t('map.key')), svgIcon('chevron', 'caret')),
         h('div', { class: 'gl-body', id: 'map-key', hidden: this.legendOpen ? null : true },
-          h('div', { class: 'gl-title' }, t(`map.cut.${cut}`)), colors,
-          h('div', { class: 'gl-title' }, t('map.edges')), h('ul', { class: 'gl-list' }, edges)))
+          !groups ? h('ul', { class: 'gl-list gl-shapes' }, SHAPES.map(([id]) => item(shapeIcon(id), t(`map.shape.${id}`)))) : null,
+          h('details', { class: 'gl-details', open: groups ? true : null },
+            h('summary', null, t('map.key.details')),
+            h('div', { class: 'gl-title' }, t(`map.cut.${cut}`)), colors,
+            h('div', { class: 'gl-title' }, t('map.edges')), h('ul', { class: 'gl-list' }, edges))))
     },
     applySizes() {
       const M = DSHMap.model
       const cy = this.cy
       if (!cy) return
-      const sizeOf = state.size === 'dependents'
-        ? p => Math.round(Math.max(16, Math.min(84, 16 + Math.sqrt(M.inDegree(p.id)) * 7)))
-        : state.size === 'commits'
-          ? p => Math.round(Math.max(16, Math.min(84, 14 + Math.sqrt(p.git?.commits ?? 0) * 2.4)))
-          : p => p.size
-      cy.batch(() => M.packages.forEach(p => cy.$id(p.id).data('size', sizeOf(p))))
+      cy.batch(() => M.packages.forEach(p => cy.$id(p.id).data('size', packageSize(p))))
+      this.applyLayout(false)
     },
     isVisible(p) {
       const M = DSHMap.model
@@ -836,6 +840,7 @@
           setDisplay(e, show)
           const hl = this.highlight
           e.toggleClass('dimcut', !!hl && !(hl.has(e.data('source')) && hl.has(e.data('target'))))
+          if (e.hasClass('dep')) e.toggleClass('cross', M.pkgById.get(e.data('source')).group !== M.pkgById.get(e.data('target')).group)
           if (show && e.hasClass('dep')) {
             const k = `g:${M.pkgById.get(e.data('source')).group}\u0000g:${M.pkgById.get(e.data('target')).group}`
             agg.set(k, (agg.get(k) ?? 0) + 1)
@@ -843,10 +848,20 @@
         })
         cy.edges('.pgedge').forEach(e => {
           const n = agg.get(`${e.data('source')}\u0000${e.data('target')}`) ?? 0
-          if (n && e.data('n') !== n) e.data({ n, w: aggWidth(n) })
+          if (e.data('n') !== n) e.data({ n, w: aggWidth(n) })
           setDisplay(e, !!n)
           e.toggleClass('dimcut', !!this.highlight)
         })
+        // Keep only the two strongest visible aggregate links per group at overview scale.
+        const backbone = cy.collection()
+        cy.nodes('.grp').forEach(g => {
+          g.connectedEdges('.pgedge').filter(e => e.data('n') > 0)
+            .sort((a, b) => b.data('n') - a.data('n')).slice(0, BACKBONE_PER_GROUP)
+            .forEach(e => backbone.merge(e))
+        })
+        cy.edges('.pgedge').addClass('minor')
+        backbone.removeClass('minor')
+        this.lodKey = null
         setDisplay(cy.nodes('.layer-label'), pkgMode)
       })
       if (q) {
@@ -883,7 +898,7 @@
       if (!cy) return
       this.focusRef = ref
       clearTimeout(this.dimTimer); this.dimmed = false
-      cy.batch(() => cy.elements().removeClass('faded focus nb-out nb-in nb2 e-out e-in e-2 gfocus hover hover-dim'))
+      cy.batch(() => cy.elements().removeClass('faded focus nb-out nb-in nb2 e-out e-in e-2 gfocus hover hover-dim hover-out hover-in'))
       this.applyLod()
       if (!ref) { this.focusBar.classList.add('hidden'); return }
       const [type, ...rest] = ref.split(':')
@@ -1015,7 +1030,11 @@
             p.git ? h('span', null, `${fmt.num(p.git.commits)} ${t('d.stats.commits')}`) : null),
           state.profile ? h('div', { class: 'tt-sub tt-gap' }, `${state.profile}: ${DSHMap.ui.presenceTitle(M.presence(p, state.profile)) || t('map.profile.legend.off')}`) : null)
         if (!this.focusRef) {
-          this.cy.batch(() => { n.addClass('hover'); shown(n.connectedEdges()).addClass('hover') })
+          this.cy.batch(() => {
+            n.addClass('hover')
+            shown(n.outgoers('edge')).addClass('hover hover-out')
+            shown(n.incomers('edge')).addClass('hover hover-in')
+          })
         }
       } else {
         const gid = n.data('gid')
@@ -1032,7 +1051,7 @@
     },
     unhover() {
       DSHMap.tooltip.hide()
-      this.cy?.batch(() => this.cy.elements('.hover').removeClass('hover'))
+      this.cy?.batch(() => this.cy.elements('.hover, .hover-out, .hover-in').removeClass('hover hover-out hover-in'))
       this.scheduleDim(null)
     },
     /** Hover dimming (3.7), slightly delayed so sweeping the pointer across nodes does not flicker. */
@@ -1219,6 +1238,21 @@
     },
   }
 
+  const SHAPES = [
+    ['definition', '<polygon points="7,1 13,7 7,13 1,7"/>'],
+    ['provider', '<polygon points="7,1 13,13 1,13"/>'],
+    ['plugin', '<circle cx="7" cy="7" r="5.5"/>'],
+    ['library', '<rect x="1.5" y="2.5" width="11" height="9" rx="2.5"/>'],
+    ['bundle', '<polygon points="7,1 12.5,4 12.5,10 7,13 1.5,10 1.5,4"/>'],
+    ['app', '<polygon points="7,1 8.8,5 13,5.3 9.8,8.2 10.8,12.6 7,10.3 3.2,12.6 4.2,8.2 1,5.3 5.2,5"/>'],
+  ]
+  function shapeIcon(id) {
+    const path = id === 'owner'
+      ? '<circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="2"/>'
+      : SHAPES.find(([key]) => key === id)[1]
+    return h('span', { class: 'gl-shape', 'aria-hidden': 'true', html: `<svg viewBox="0 0 14 14" fill="currentColor">${path}</svg>` })
+  }
+
   /** Role of a package in capability seams: definition > provider > consumer. */
   function seamRole(p) {
     const M = DSHMap.model
@@ -1238,8 +1272,18 @@
   }
 
   /** Architecture-poster layout of the current model (see layout.js). */
+  function packageSize(p) {
+    return state.size === 'dependents'
+      ? Math.round(Math.max(16, Math.min(84, 16 + Math.sqrt(DSHMap.model.inDegree(p.id)) * 7)))
+      : state.size === 'commits'
+        ? Math.round(Math.max(16, Math.min(84, 14 + Math.sqrt(p.git?.commits ?? 0) * 2.4)))
+        : p.size
+  }
+  function layoutNodes() {
+    return DSHMap.model.packages.map(p => ({ id: p.id, group: p.group, size: packageSize(p) }))
+  }
   function layeredPositions() {
     const M = DSHMap.model
-    return DSHMap.layout.layered({ layers: M.layers, groups: M.groups, lines: id => M.pkgById.get(id).stats.src.lines })
+    return DSHMap.layout.layered({ layers: M.layers, groups: M.groups, lines: id => M.pkgById.get(id).stats.src.lines, size: id => packageSize(M.pkgById.get(id)) })
   }
 })()
