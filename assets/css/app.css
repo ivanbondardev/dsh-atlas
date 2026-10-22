@@ -1585,3 +1585,56 @@ th.num .th-sort { justify-content: flex-end; }
 /* ── guide layer: reference chips and term tooltips (guide.js) ───────── */
 .ref-chips { margin-top: var(--sp-1); }
 .tooltip .tt-hint { margin: var(--sp-1) 0 0; }
+
+/* Spatial UI atlas: schematic geometry, live slot metadata. */
+.wl-toolbar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin:16px 0; }
+.wl-toolbar input { min-width:220px; padding:9px 12px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); }
+.wl-workspace { display:grid; grid-template-columns:minmax(0, 1.7fr) minmax(280px, 1fr); gap:20px; margin-top:20px; align-items:start; }
+.wl-window-title { display:flex; justify-content:space-between; padding:14px; font-size:11px; letter-spacing:.08em; border:1px solid var(--border); border-bottom:0; border-radius:12px 12px 0 0; }
+.wl-canvas { display:grid; gap:10px; padding:16px; border:1px solid var(--border); border-radius:0 0 12px 12px; min-height:440px; background:color-mix(in srgb, var(--accent) 4%, var(--bg)); }
+.wl-shell { grid-template-columns:1fr 1.8fr 1fr; grid-template-rows:1fr 60px 60px; grid-template-areas:'side main right' 'bottom bottom bottom' 'overlay overlay overlay'; }
+.wl-conversation { grid-template-columns:1fr 1fr; grid-template-rows:64px 64px 1fr 86px; grid-template-areas:'header header' 'actions utilities' 'flow flow' 'composer composer'; }
+.wl-composer { grid-template-columns:repeat(4,1fr); grid-template-rows:60px 60px 1fr 60px 70px; grid-template-areas:'overlay overlay overlay overlay' 'attachments attachments attachments attachments' 'text text text text' 'permission permission plan plan' 'left model model right'; }
+.wl-region { min-width:0; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:9px; padding:14px; text-align:left; color:var(--text); background:var(--bg); border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--border)); border-radius:8px; cursor:pointer; transition:background .15s,border-color .15s; }
+.wl-region:hover,.wl-region.is-selected { border:1px solid var(--accent); background:color-mix(in srgb,var(--accent) 14%,var(--bg)); }
+.wl-region:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.wl-region code { font-size:11px; overflow-wrap:anywhere; }
+.wl-label { font-size:13px; font-weight:600; }
+.wl-region .badge { font-size:10px; }
+.wl-textarea { padding:20px; color:var(--muted); display:flex; flex-direction:column; justify-content:space-between; border:1px solid var(--border); border-radius:8px; }
+.wl-messages { display:grid; gap:10px; opacity:.35; width:100%; }
+.wl-messages span:nth-child(2) { text-align:right; }
+.wl-detail { max-height:750px; overflow:auto; }
+@media(max-width:1000px) { .wl-workspace { grid-template-columns:1fr; } .wl-detail { max-height:none; } }
+@media(max-width:560px) { .wl-canvas { padding:8px; gap:5px; } .wl-region { padding:7px; } .wl-region .badge { white-space:normal; } .wl-shell { grid-template-columns:1fr 1.4fr 1fr; } }
+.wl-shell { grid-template-rows:minmax(250px,1fr) minmax(90px,auto) minmax(90px,auto); }
+.wl-conversation { grid-template-rows:minmax(90px,auto) minmax(110px,auto) minmax(180px,1fr) minmax(100px,auto); }
+.wl-composer { grid-template-rows:minmax(90px,auto) minmax(90px,auto) minmax(130px,1fr) minmax(110px,auto) minmax(130px,auto); }
+.wl-occupants { display:flex; flex-direction:column; gap:8px; width:100%; }
+.wl-occupant { display:block; font:11px var(--mono); overflow-wrap:anywhere; border-top:1px solid var(--border); padding-top:8px; }
+.wl-occupant small { display:block; font:11px var(--font); color:var(--muted); margin-top:4px; }
+.wl-evidence { border-bottom:1px solid var(--border); padding-bottom:20px; margin-bottom:20px; overflow-wrap:anywhere; }
+.wl-plugin-row { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+.wl-composer.wl-observed { grid-template-columns:64px minmax(0,1fr) minmax(0,1fr) 64px; grid-template-rows:minmax(180px,1fr) auto; grid-template-areas:'text text text text' 'add permission model send'; min-height:340px; }
+.wl-native { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:8px; font-size:22px; padding:8px; }
+.wl-native small { font-size:10px; text-align:center; color:var(--muted); }
+.wl-proof { margin-top:20px; }
+.wl-proof summary { cursor:pointer; margin-bottom:12px; }
+
+/* Keep the diagram visibly separate from the Atlas chrome in either theme. */
+.wl-canvas { --wl-ink:#172b45; --wl-muted:#415775; color:var(--wl-ink); background:#e5edf7; border-color:#8ba4c4; box-shadow:0 8px 24px #0002; color-scheme:light; }
+.wl-window-title { color:#edf5ff; background:#294565; border-color:#8ba4c4; }
+.wl-region { --wl-fill:#dceaff; --wl-edge:#7298ca; color:var(--wl-ink); background:var(--wl-fill); border:1px solid var(--wl-edge); border-left-width:4px; box-shadow:0 2px 4px #19345112; }
+.wl-region[data-area="side"], .wl-region[data-area="permission"], .wl-region[data-area="actions"] { --wl-fill:#d6f0e7; --wl-edge:#438e78; }
+.wl-region[data-area="right"], .wl-region[data-area="model"], .wl-region[data-area="utilities"] { --wl-fill:#e8dff9; --wl-edge:#9170bc; }
+.wl-region[data-area="overlay"], .wl-region[data-area="plan"] { --wl-fill:#ffebc8; --wl-edge:#b68836; }
+.wl-region[data-area="bottom"], .wl-region[data-area="attachments"], .wl-region[data-area="composer"] { --wl-fill:#d3eff4; --wl-edge:#4d94a2; }
+.wl-region:hover { background:color-mix(in srgb,var(--wl-fill) 65%,white); border-color:#245ca8; }
+.wl-region.is-selected { background:var(--wl-fill); border-color:#1959ad; outline:3px solid #1959ad; outline-offset:2px; box-shadow:0 0 0 5px #fff; }
+.wl-region:focus-visible { outline:3px solid #172b45; outline-offset:3px; }
+.wl-region code { color:#243b58; background:transparent; }
+.wl-region .badge { color:#243b58; background:#ffffffa6; border-color:#6d829e66; }
+.wl-occupant { border-color:#526c8b40; }
+.wl-occupant small, .wl-native small { color:var(--wl-muted); }
+.wl-textarea { color:#415775; background:#fff; border:1px solid #8299b8; box-shadow:inset 0 2px 4px #1934510c; }
+.wl-native { color:#294565; background:#f5f8fc; border:1px solid #a5b8cf; border-radius:8px; }

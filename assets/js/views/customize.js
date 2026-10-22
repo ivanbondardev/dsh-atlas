@@ -17,6 +17,7 @@
       'cz.tab.events': 'Перехоплення подій',
       'cz.tab.recipes': 'Рецепти',
       'cz.tab.slots': 'UI-слоти',
+      'cz.tab.layouts': 'Web UI — макети',
       'cz.layers': 'Шари композиції',
       'cz.quick': 'Готові патчі',
       'cz.quick.lead': 'Кожен патч генератор застосовує до свого профілю тим самим рушієм, що й пісочниця: він має змінювати рядки й не давати попереджень.',
@@ -177,6 +178,7 @@
       'cz.tab.events': 'Intercepting events',
       'cz.tab.recipes': 'Recipes',
       'cz.tab.slots': 'UI slots',
+      'cz.tab.layouts': 'Web UI — layouts',
       'cz.layers': 'Composition layers',
       'cz.quick': 'Ready patches',
       'cz.quick.lead': 'The generator applies every patch to its profile with the same engine as the sandbox: it must change rows and raise no warnings.',
@@ -332,7 +334,287 @@
     },
   })
 
-  const TABS = ['catalog', 'sandbox', 'config', 'events', 'recipes', 'slots']
+  // BEGIN LAYOUT EVIDENCE
+  const LAYOUT_EVIDENCE = {
+  "sidebar": {
+    "render": [
+      "packages/client/ui-layout/src/client/AppFrame.tsx:242"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-sidebar",
+        "source": "packages/client/ui-sidebar/src/client/index.ts:77"
+      }
+    ]
+  },
+  "main": {
+    "render": [
+      "packages/client/ui-layout/src/client/AppFrame.tsx:42"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-conversation",
+        "source": "packages/client/ui-conversation/src/client/apply.ts:562"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-plugin-manager",
+        "source": "packages/client/ui-plugin-manager/src/client/index.ts:115"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-schedule",
+        "source": "packages/client/ui-schedule/src/client/index.ts:169"
+      }
+    ]
+  },
+  "rightbar": {
+    "render": [
+      "packages/client/ui-layout/src/client/AppFrame.tsx:286"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-sidebar-right",
+        "source": "packages/client/ui-sidebar-right/src/client/index.ts:206"
+      }
+    ]
+  },
+  "shell.bottom": {
+    "render": [
+      "packages/client/ui-layout/src/client/AppFrame.tsx:290"
+    ],
+    "registrations": []
+  },
+  "shell.overlay": {
+    "render": [
+      "packages/client/ui-layout/src/client/AppFrame.tsx:249"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-chat",
+        "source": "packages/client/ui-chat/src/client/apply.ts:306"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-plugin-manager",
+        "source": "packages/client/ui-plugin-manager/src/client/index.ts:105"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-schedule",
+        "source": "packages/client/ui-schedule/src/client/index.ts:113"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-settings-account",
+        "source": "packages/client/ui-settings-account/src/client/index.ts:275"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-settings-account",
+        "source": "packages/client/ui-settings-account/src/client/index.ts:303"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-settings-account",
+        "source": "packages/client/ui-settings-account/src/client/index.ts:275"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-settings-account",
+        "source": "packages/client/ui-settings-account/src/client/index.ts:303"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-settings-general",
+        "source": "packages/client/ui-settings-general/src/client/index.ts:250"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-settings-session-log",
+        "source": "packages/client/ui-settings-session-log/src/client/index.ts:39"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-shortcuts",
+        "source": "packages/client/ui-shortcuts/src/client/index.ts:67"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-workspace",
+        "source": "packages/client/ui-workspace/src/client/index.ts:331"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-workspace",
+        "source": "packages/client/ui-workspace/src/client/index.ts:334"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-workspace",
+        "source": "packages/client/ui-workspace/src/client/index.ts:337"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-workspace",
+        "source": "packages/client/ui-workspace/src/client/index.ts:331"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-workspace",
+        "source": "packages/client/ui-workspace/src/client/index.ts:334"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-workspace",
+        "source": "packages/client/ui-workspace/src/client/index.ts:337"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-workspace",
+        "source": "packages/client/ui-workspace/src/client/index.ts:331"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-workspace",
+        "source": "packages/client/ui-workspace/src/client/index.ts:334"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-workspace",
+        "source": "packages/client/ui-workspace/src/client/index.ts:337"
+      }
+    ]
+  },
+  "conversation.header": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/ConversationMainPanel.tsx:47"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-conversation",
+        "source": "packages/client/ui-conversation/src/client/apply.ts:421"
+      }
+    ]
+  },
+  "conversation.session.header.actions": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/ConversationSession.tsx:128"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-agent-preset",
+        "source": "packages/client/ui-agent-preset/src/client/index.ts:215"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-jobs",
+        "source": "packages/client/ui-jobs/src/client/index.ts:38"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-subagent",
+        "source": "packages/client/ui-subagent/src/client/index.ts:85"
+      }
+    ]
+  },
+  "conversation.session.header.utilities": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/ConversationSession.tsx:132"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-open-in-app",
+        "source": "packages/client/ui-open-in-app/src/client/index.ts:103"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-schedule",
+        "source": "packages/client/ui-schedule/src/client/index.ts:211"
+      }
+    ]
+  },
+  "conversation.view": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/DefaultConversationViews.tsx:36"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-chat",
+        "source": "packages/client/ui-chat/src/client/apply.ts:229"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-trajectory",
+        "source": "packages/client/ui-trajectory/src/client/index.ts:80"
+      }
+    ]
+  },
+  "conversation.composer.bar": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/ConversationContent.tsx:147"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-conversation",
+        "source": "packages/client/ui-conversation/src/client/apply.ts:449"
+      }
+    ]
+  },
+  "conversation.input.overlay": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/InputBar.tsx:404"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-commands",
+        "source": "packages/client/ui-commands/src/client/index.ts:65"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-input-trigger",
+        "source": "packages/client/ui-input-trigger/src/client/index.ts:66"
+      },
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-message-feedback",
+        "source": "packages/client/ui-message-feedback/src/client/index.ts:116"
+      }
+    ]
+  },
+  "conversation.input.attachments": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/InputBar.tsx:407"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-attachment",
+        "source": "packages/client/ui-attachment/src/client/index.ts:23"
+      }
+    ]
+  },
+  "conversation.input.permission": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/InputBar.tsx:464"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-permission-presets",
+        "source": "packages/client/ui-permission-presets/src/client/index.ts:168"
+      }
+    ]
+  },
+  "conversation.input.plan": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/InputBar.tsx:465"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-plan",
+        "source": "packages/client/ui-plan/src/client/index.ts:117"
+      }
+    ]
+  },
+  "conversation.input.left": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/InputBar.tsx:469"
+    ],
+    "registrations": []
+  },
+  "conversation.input.right": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/InputBar.tsx:475"
+    ],
+    "registrations": []
+  },
+  "conversation.input.model": {
+    "render": [
+      "packages/client/ui-conversation/src/client/skeleton/InputBar.tsx:476"
+    ],
+    "registrations": [
+      {
+        "pkg": "@deepseek-ai/dsh-client-ui-model-selection",
+        "source": "packages/client/ui-model-selection/src/client/index.ts:173"
+      }
+    ]
+  }
+}
+  // END LAYOUT EVIDENCE
+  const TABS = ['catalog', 'sandbox', 'config', 'events', 'recipes', 'slots', 'layouts']
   const GLYPH = { on: '●', cond: '◐', off: '○', dep: '◌' }
   const LEVEL_BADGE = { error: 'danger', warn: 'warn', info: 'accent' }
 
@@ -407,6 +689,7 @@
     update(params, prev) {
       const tab = this.tab(params)
       if (tab !== this.tab(prev) || params.profile !== prev.profile) { this.render(params); return }
+      if (tab === 'layouts') { this.render(params); return }
       if (tab === 'sandbox') return // the editor owns `p`; re-rendering would steal focus
       if (tab === 'recipes' && (params.track !== prev.track || params.step !== prev.step)) { this.render(params); return }
       // Back/Forward over a filter: take it from the route.
@@ -425,7 +708,7 @@
       // Tabs seen before come back from the pane cache with their filters (4.5).
       // The sandbox editor owns its route key `p`: it always starts from the route.
       const key = `${tab}|${params.profile ?? ''}|${tab === 'recipes' ? `${params.track ?? ''}|${params.step ?? ''}` : ''}`
-      if (tab === 'sandbox') this.panes.drop(key)
+      if (tab === 'sandbox' || tab === 'layouts') this.panes.drop(key)
       const { fresh } = this.panes.show(key, body => this[`render_${tab}`](body, params), this.el)
       if (!fresh) {
         if (this.filter?.sync(params)) this.filter.redraw()
@@ -772,6 +1055,119 @@
       body.appendChild(h('h2', { class: 'section-title' }, t('cz.sl.services')))
       body.appendChild(h('div', { class: 'chips' }, M.clientServices.map(s => ui.svcChip(s.key))))
     },
+    render_layouts(body, params) {
+      const pick = (uk, en) => i18n.pick({ uk, en })
+      const ui = DSHMap.ui
+      const screen = ['shell', 'conversation', 'composer'].includes(params.screen) ? params.screen : 'shell'
+      const observed = screen === 'composer' && params.layoutState !== 'catalog' && (!params.slot || ['conversation.input.permission', 'conversation.input.model'].includes(params.slot))
+      const technical = params.mode !== 'interface'
+      const mounted = new Map()
+      const collect = (rows, inherited = 'on') => {
+        for (const row of rows) {
+          const state = inherited === 'off' || row.state === 'off' ? 'off' : inherited === 'cond' || row.state === 'cond' ? 'cond' : row.state
+          if (row.pkg) {
+            const old = mounted.get(row.pkg)
+            if (!old || state === 'on' || (state === 'cond' && old.state !== 'on')) mounted.set(row.pkg, { state, id: row.id, expr: row.expr })
+          }
+          collect(row.children ?? [], state)
+        }
+      }
+      collect(DSHMap.model.profileByName.get('web')?.rows ?? [])
+      const status = pkg => {
+        const state = mounted.get(pkg)?.state
+        return state === 'on' ? pick('включено у web', 'enabled in web') : state === 'off' ? pick('вимкнено у web', 'disabled in web') : state === 'cond' ? pick('умовно у web', 'conditional in web') : pick('немає прямого рядка web', 'no direct web entry')
+      }
+      const conditions = {
+        'main': ['Ключ визначається активною панеллю; для розмови — conversation.', 'Key follows the active panel; conversation for this screen.'],
+        'rightbar': ['Вміст отримує width, viewportWidth і canShow; видимість залежить від стану правої колонки.', 'Content receives width, viewportWidth and canShow; visibility follows right-column state.'],
+        'conversation.view': ['Порожня сесія у фазі blank не рендерить view. Вибирається лише активний viewId.', 'A blank session in the blank phase renders no view. Only the active viewId is selected.'],
+        'conversation.session.header.actions': ['Рендериться лише коли hideChrome = false.', 'Rendered only when hideChrome is false.'],
+        'conversation.session.header.utilities': ['Рендериться лише коли hideChrome = false.', 'Rendered only when hideChrome is false.'],
+        'conversation.input.model': ['Потрібен sessionId. Контрол приховано, коли activity = true.', 'Requires sessionId. Hidden while activity is true.'],
+        'conversation.input.permission': ['Рендериться лише за наявності sessionId; locked передається компоненту.', 'Requires sessionId; locked is passed to the component.'],
+        'conversation.input.plan': ['Рендериться лише за наявності sessionId; locked передається компоненту.', 'Requires sessionId; locked is passed to the component.'],
+        'conversation.input.left': ['Потрібні input і sessionId.', 'Requires input and sessionId.'],
+        'conversation.input.right': ['Потрібні input і sessionId; приховано під час activity.', 'Requires input and sessionId; hidden during activity.']
+      }
+
+      const regions = {
+        shell: [
+          ['sidebar', 'Бічна панель', 'Sidebar', 'side'],
+          ['main', 'Активна панель · розмова', 'Active panel · conversation', 'main'],
+          ['rightbar', 'Права панель', 'Right panel', 'right'],
+          ['shell.bottom', 'Нижня смуга', 'Bottom bar', 'bottom'],
+          ['shell.overlay', 'Накладки та сповіщення', 'Overlays and notifications', 'overlay']],
+        conversation: [
+          ['conversation.header', 'Заголовок розмови', 'Conversation header', 'header'],
+          ['conversation.session.header.actions', 'Дії сесії', 'Session actions', 'actions'],
+          ['conversation.session.header.utilities', 'Додаткові дії', 'Utilities', 'utilities'],
+          ['conversation.view', 'Область розмови', 'Conversation view', 'flow'],
+          ['conversation.composer.bar', 'Поле вводу повідомлення', 'Message composer', 'composer']],
+        composer: [
+          ['conversation.input.overlay', 'Накладка над полем вводу', 'Composer overlay', 'overlay'],
+          ['conversation.input.attachments', 'Прикріплені файли', 'Attachments', 'attachments'],
+          ['conversation.input.permission', 'Дозволи', 'Permissions', 'permission'],
+          ['conversation.input.plan', 'План', 'Plan', 'plan'],
+          ['conversation.input.left', 'Ліві дії', 'Left actions', 'left'],
+          ['conversation.input.right', 'Праві дії', 'Right actions', 'right'],
+          ['conversation.input.model', 'Вибір моделі', 'Model selector', 'model']]
+      }
+      const all = Object.entries(regions).flatMap(([screen, rows]) => rows.map(row => ({ screen, row })))
+      const go = changes => DSHMap.router.go('customize', { tab: 'layouts', screen, mode: params.mode, slot: params.slot, layoutState: params.layoutState, ...changes })
+      body.appendChild(h('p', { class: 'callout' }, pick('Анатомія Web UI. Натисніть область, щоб побачити її контракт, зареєстровані компоненти та код.', 'Web UI anatomy. Select a region to inspect its contract, registered components and source.')))
+      body.appendChild(h('div', { class: 'callout' }, pick('Профіль: web · Схеми областей інтерфейсу. Наповнення — з каталогу реєстрацій; статус — з ефективної композиції. Це статичний аналіз, а не знімок запущеного DSH.', 'Profile: web · Interface region schematics. Occupants come from the registration catalog; status comes from effective composition. This is static analysis, not a running DSH snapshot.')))
+      const search = h('input', { type: 'search', class: 'input', placeholder: pick('Знайти слот на макеті…', 'Find a slot in the layout…'), 'aria-label': pick('Пошук слотів', 'Search slots') })
+      const results = h('div', { class: 'chips' })
+      search.addEventListener('input', () => {
+        clear(results)
+        const q = search.value.trim().toLowerCase()
+        if (!q) return
+        const matches = all.filter(x => x.row.join(' ').toLowerCase().includes(q))
+        for (const x of matches) results.appendChild(h('button', { class: 'chip link mono', onclick: () => go({ screen: x.screen, slot: x.row[0], layoutState: 'catalog' }) }, x.row[0]))
+        if (!matches.length) results.appendChild(h('span', { class: 'muted small' }, pick('На цих макетах немає відповідності. Повний перелік — у вкладці UI-слоти.', 'No match in these layouts. See UI slots for the full catalog.')))
+      })
+      body.append(h('div', { class: 'wl-toolbar' },
+        ui.tabs([['shell', pick('Вікно', 'Window')], ['conversation', pick('Розмова', 'Conversation')], ['composer', pick('Поле вводу', 'Composer')]], screen, id => go({ screen: id, slot: null }), 'Web UI'),
+        h('button', { class: 'chip link', 'aria-pressed': String(technical), onclick: () => go({ mode: technical ? 'interface' : 'slots' }) }, technical ? pick('◉ Точки розширення', '◉ Extension points') : pick('◉ Інтерфейс', '◉ Interface')), search), results)
+      if (screen === 'composer') body.appendChild(ui.tabs([['observed', pick('Перевірений стан: нова сесія', 'Observed: new session')], ['catalog', pick('Усі точки розширення', 'All extension points')]], observed ? 'observed' : 'catalog', id => go({ layoutState: id, slot: null }), pick('Стан composer', 'Composer state')))
+      const canvas = h('div', { class: `wl-canvas wl-${screen}${observed ? ' wl-observed' : ''}` })
+      for (const [key, uk, en, area] of regions[screen]) {
+        const slot = DSHMap.model.slotByKey.get(key)
+        if (!slot || (observed && !['conversation.input.permission', 'conversation.input.model'].includes(key))) continue
+        canvas.appendChild(h('button', { 'data-area': area, class: ['wl-region', params.slot === key ? 'is-selected' : null], style: `grid-area: ${area}`, 'aria-pressed': String(params.slot === key), onclick: () => go({ slot: key }) },
+          h('span', { class: 'wl-label' }, pick(uk, en)), technical ? h('code', null, key) : null,
+          technical ? h('span', { class: 'badge' }, `${slot.kind} · ${slot.scope}`) : null,
+          h('span', { class: 'wl-occupants' }, slot.occupants.length ? [h('small', null, pick('Реєстрації каталогу', 'Catalog registrations')), ...slot.occupants.filter(o => key !== 'main' || o.pkg === '@deepseek-ai/dsh-client-ui-conversation').slice(0, 2).map(o => h('span', { class: 'wl-occupant' }, o.text, h('small', null, status(o.pkg)))), slot.occupants.length > 2 ? h('small', null, pick('Усі реєстрації — у картці', 'All registrations in the detail panel')) : null] : pick('Немає зареєстрованого наповнення', 'No cataloged occupants')),
+          area === 'flow' ? h('div', { class: 'wl-messages', 'aria-hidden': 'true' }, h('span', null, '················'), h('span', null, '····························'), h('span', null, '····················')) : null))
+      }
+      if (screen === 'composer') canvas.appendChild(h('div', { class: 'wl-textarea', style: 'grid-area: text' }, pick('Напишіть повідомлення…', 'Write a message…'), h('small', null, pick('Звичайне поле вводу · не слот', 'Native input · not a slot'))))
+      if (observed) {
+        canvas.append(h('div', { class: 'wl-native', style: 'grid-area: add' }, '+', h('small', null, pick('Меню · кнопка InputBar', 'Menu · InputBar button'))), h('div', { class: 'wl-native', style: 'grid-area: send' }, '↑', h('small', null, pick('Надіслати · вимкнено', 'Send · disabled'))))
+        body.appendChild(h('p', { class: 'callout' }, pick('Перевірено у запущеному DSH 0.2.1-rc.2 / 687f282: нова порожня сесія, без налаштованої моделі, desktop Web 1280×729. Видно дозвіл і вибір моделі; план, вкладення й меню-накладка приховані. «+» відкриває меню команд. Відповідь моделі та активне виконання не перевірені.', 'Observed in running DSH 0.2.1-rc.2 / 687f282: new empty session, no configured model, desktop Web 1280×729. Permission and model controls are visible; plan, attachments and menu overlay are hidden. + opens the command menu. Model responses and active execution were not verified.')))
+      }
+      this.slotDetail = h('div', { class: 'cz-slot-detail card wl-detail' })
+      body.appendChild(h('div', { class: 'wl-workspace' }, h('div', null, h('div', { class: 'wl-window-title' }, 'DSH / WEB UI', h('span', null, pick('Схематичний макет', 'Schematic layout'))), canvas,
+        h('p', { class: 'small muted' }, pick('Геометрія узагальнена. Реєстрація компонента не гарантує його видимість. Накладки показані окремою смугою; у застосунку вони розташовані над вмістом.', 'Geometry is simplified. Registration does not guarantee visibility. Overlays are shown as a separate band; in the app they sit above content.')),
+        h('div', { class: 'chips' }, h('button', { class: 'chip link', onclick: () => DSHMap.nav.openFile('packages/client/ui-layout/src/client/AppFrame.tsx') }, 'AppFrame.tsx'), h('button', { class: 'chip link', onclick: () => DSHMap.router.go('customize', { tab: 'slots', slot: params.slot }) }, pick('Відкрити каталог слотів →', 'Open slot catalog →')))), this.slotDetail))
+      if (screen === 'composer') body.appendChild(h('details', { class: 'card wl-proof' }, h('summary', null, pick('Знімок реального DSH · 22 жовтня 2026', 'Actual DSH screenshot · 22 October 2026')), h('img', { src: 'assets/dsh-composer-observed.png', alt: pick('Реальний DSH: нова сесія з composer, дозволами та вибором моделі', 'Actual DSH: new session with composer, permissions and model selector'), style: 'width:100%;height:auto' })))
+      this.renderSlotDetail(params.slot)
+      const selected = DSHMap.model.slotByKey.get(params.slot)
+      if (selected) {
+        const evidence = LAYOUT_EVIDENCE[selected.key]
+        const condition = conditions[selected.key]
+        const box = h('div', { class: 'wl-evidence' },
+          h('h3', null, pick('Підтвердження з коду', 'Source evidence')),
+          h('p', { class: 'small' }, condition ? pick(...condition) : pick('Умови визначає контейнер і реалізація компонента. Дивіться місця рендерингу нижче.', 'Conditions are controlled by the container and component implementation. See render sites below.')),
+          h('div', { class: 'd-sub-h' }, pick('Плагіни у композиції web', 'Plugins in web composition')),
+          selected.occupants.map(o => h('div', { class: 'wl-plugin-row' }, o.pkg ? ui.pkgChip(o.pkg) : o.text, h('span', { class: 'badge' }, status(o.pkg)), mounted.get(o.pkg)?.expr ? h('code', null, mounted.get(o.pkg).expr) : null)),
+          h('button', { class: 'chip link', onclick: () => DSHMap.router.go('composition', { profile: 'web' }) }, pick('Відкрити композицію web →', 'Open web composition →')),
+          h('div', { class: 'd-sub-h' }, pick('Місця рендерингу', 'Render sites')),
+          (evidence?.render ?? []).map(source => h('div', { class: 'small' }, ui.sourceLink(source))),
+          h('div', { class: 'd-sub-h' }, pick('Реєстрації компонентів', 'Component registrations')),
+          (evidence?.registrations ?? []).map(r => h('div', { class: 'small' }, ui.sourceLink(r.source))))
+        this.slotDetail.prepend(box)
+      }
+    },
     markSlot(key) {
       for (const el of this.root.querySelectorAll('.cz-slot')) DSHMap.ui.select(el, el.dataset.slot === key)
     },
@@ -783,6 +1179,11 @@
       clear(box)
       const s = key ? M.slotByKey.get(key) : null
       if (!s) { box.appendChild(ui.emptyState({ icon: 'grid', text: t('cz.sl.pick'), compact: true })); return }
+      if (DSHMap.router.params.tab === 'slots') {
+        const groups = { shell: ['sidebar', 'main', 'rightbar', 'shell.bottom', 'shell.overlay'], conversation: ['conversation.header', 'conversation.session.header.actions', 'conversation.session.header.utilities', 'conversation.view', 'conversation.composer.bar'], composer: ['conversation.input.overlay', 'conversation.input.attachments', 'conversation.input.permission', 'conversation.input.plan', 'conversation.input.left', 'conversation.input.right', 'conversation.input.model'] }
+        const screen = Object.keys(groups).find(k => groups[k].includes(s.key))
+        if (screen) box.appendChild(h('button', { class: 'chip link', onclick: () => DSHMap.router.go('customize', { tab: 'layouts', screen, slot: s.key }) }, i18n.pick({ uk: 'Показати на макеті →', en: 'Show in layout →' })))
+      }
       box.appendChild(h('div', null,
         h('div', { class: 'd-kicker' }, t('type.slot')),
         h('h2', { class: 'd-title cz-slot-title' }, s.key),
