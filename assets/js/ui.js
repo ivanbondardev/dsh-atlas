@@ -1109,7 +1109,62 @@
   }
 
   // ── small shared widgets ────────────────────────────────────────────────
+  /**
+   * Three-column relation diagram with SVG connectors.
+   * @param {{ left: {title, items: Node[]}[], center: Node, right: {title, items: Node[]}[] }} spec
+   */
+  function relDiagram(spec) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    svg.setAttribute('class', 'rel-svg')
+    svg.setAttribute('aria-hidden', 'true')
+    const col = (blocks, side) => h('div', { class: ['rel-col', side] }, blocks.filter(b => b.items.length).map(b => [h('h6', null, b.title), ...b.items.map(it => { it.dataset.side = side; it.dataset.kind = b.kind ?? ''; return it })]))
+    const left = col(spec.left, 'left')
+    const right = col(spec.right, 'right')
+    const center = h('div', { class: 'rel-center' }, spec.center)
+    const box = h('div', { class: 'rel-diagram' }, svg, left, center, right)
+    let ro = null, seen = false
+    const draw = () => {
+      if (!box.isConnected) { if (seen && ro) { ro.disconnect(); ro = null } return }
+      seen = true
+      const br = box.getBoundingClientRect()
+      const cr = center.getBoundingClientRect()
+      svg.setAttribute('width', br.width); svg.setAttribute('height', br.height)
+      svg.innerHTML = ''
+      const cy = cr.top + cr.height / 2 - br.top
+      for (const node of box.querySelectorAll('.rel-node')) {
+        const r = node.getBoundingClientRect()
+        const ny = r.top + r.height / 2 - br.top
+        const isLeft = node.dataset.side === 'left'
+        const x1 = isLeft ? r.right - br.left : cr.right - br.left
+        const x2 = isLeft ? cr.left - br.left : r.left - br.left
+        const y1 = isLeft ? ny : cy, y2 = isLeft ? cy : ny
+        const mx = (x1 + x2) / 2
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        path.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`)
+        const color = node.dataset.kind === 'owner' ? 'var(--accent)' : node.dataset.kind === 'provider' ? 'var(--ok)' : node.dataset.kind === 'companion' ? 'var(--pink)' : isLeft ? 'var(--accent)' : 'var(--orange)'
+        path.setAttribute('stroke', color)
+        path.setAttribute('opacity', '0.55')
+        if (node.dataset.kind === 'companion' || node.dataset.kind === 'inject') path.setAttribute('stroke-dasharray', '4 3')
+        svg.appendChild(path)
+      }
+    }
+    requestAnimationFrame(draw)
+    ro = new ResizeObserver(() => draw())
+    ro.observe(box)
+    return box
+  }
+
+  function relNode(pkgId, note) {
+    const M = DSHMap.model
+    const p = M.pkgById.get(pkgId)
+    if (!p) return h('span', { class: 'rel-node' }, pkgId)
+    return h('button', { class: 'rel-node', title: p.role ?? p.description ?? '', onclick: () => DSHMap.nav.openPackage(p.id) },
+      h('span', { class: 'dot', style: `background:${M.colorOf(p)}` }), h('span', { class: 'truncate' }, p.short), note ? h('em', null, note) : null)
+  }
+
   DSHMap.ui = {
+    relDiagram,
+    relNode,
     /** Short global notice (bottom centre), announced politely. */
     toast(text) {
       let el = document.getElementById('toast')
