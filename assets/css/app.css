@@ -671,7 +671,7 @@ details.fold > .fold-body { padding: 0 var(--sp-3) var(--sp-3); }
   width: 292px; flex: 0 0 292px; overflow-y: auto; background: var(--panel); border-right: 1px solid var(--border);
   padding: var(--sp-4) var(--sp-4) var(--sp-7); transition: margin-left .2s var(--ease);
 }
-.side.collapsed { margin-left: calc(var(--sp-8) * -1); }
+.side.collapsed { margin-left: -292px; }
 .side h5 { margin: var(--sp-4) 0 var(--sp-2); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .6px; color: var(--text-faint); font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
 .side h5:first-child { margin-top: 2px; }
 .side h5 button { border: 0; background: none; color: var(--accent); cursor: pointer; font-size: var(--fs-xs); text-transform: none; letter-spacing: 0; font-weight: 600; padding: 0; }
@@ -1033,7 +1033,7 @@ table.rows-table tr.grp td { background: var(--panel-2); font-weight: 600; }
   .drawer { width: 100vw; }
   .drawer-resize { display: none; }
   .graph-focus-bar { left: 56px; right: 10px; }
-  .side { position: absolute; z-index: 8; height: 100%; box-shadow: var(--shadow); }
+  .side { position: absolute; z-index: 8; height: 100%; padding-top: 56px; box-shadow: var(--shadow); }
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lp-row { grid-template-columns: 1fr; }
   .concepts, .two-col { grid-template-columns: 1fr; }

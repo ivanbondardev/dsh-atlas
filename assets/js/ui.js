@@ -2,7 +2,7 @@
  * command palette, tooltip, theme and language switching. */
 (function () {
   'use strict'
-  const { h, clear, svgIcon, t, util, i18n } = DSHMap
+  const { h, clear, svgIcon, t, fmt, util, i18n } = DSHMap
 
   const VIEW_ORDER = [
     ['start', 'compass'],
@@ -1210,6 +1210,28 @@
       if (window.hljs) run()
       else DSHMap.vendor.need(['hljs']).then(run, () => { /* stays plain */ })
     },
+    turnFlow() {
+      const M = DSHMap.model
+      const wrap = h('div', { class: 'flow' })
+      for (const step of M.overview.turnFlow) {
+        const ev = step.log ? M.seByName.get(step.name) : M.evByName.get(step.name)
+        if (!ev) continue
+        const sub = step.log
+          ? t('ov.sessionLog')
+          : `${ev.mode} · ${ev.listeners.length} ${t(`n.listeners.${fmt.plural(ev.listeners.length, { one: 'one', few: 'few', many: 'many', other: 'other' })}`)}`
+        wrap.appendChild(h('button', {
+          class: ['flow-step', step.log ? 'fs-log' : 'fs-live'],
+          title: util.firstSentence(ev.description ?? '', 240),
+          onclick: () => (step.log ? DSHMap.nav.openSessionEvent(step.name) : DSHMap.nav.openEvent(step.name)),
+        },
+        h('div', { class: 'k' }, step.log ? 'log' : 'live'),
+        h('b', null, step.name),
+        h('span', null, step.text ? i18n.pick(step.text) : sub),
+        step.text ? h('div', { class: 'faint tiny flow-sub' }, sub) : null))
+      }
+      return wrap
+    },
+
     /** Inline Markdown subset of curated text: `code` spans only. */
     mdInline(text) {
       const out = []
@@ -1255,16 +1277,26 @@
       const [pathPart, frag] = href.split('#')
       const resolved = resolvePath(baseDir ?? '', pathPart)
       const M = DSHMap.model
+      const pkg = M.packages.find(p => resolved === `${p.dir}/README.md` || resolved === p.dir || resolved === `${p.dir}/`)
+      const grp = M.groups.find(g => resolved === `${g.path}/README.md`)
+      const owner = M.pkgOfPath(resolved)
+      const isFile = /\.[a-z0-9]+$/i.test(resolved)
+      let view = router.view ?? 'start'
+      let params = { ...router.params }
+      if (M.docById.has(resolved)) { view = 'docs'; params = { doc: resolved, a: frag } }
+      else if (pkg) params.d = `pkg:${pkg.id}`
+      else if (grp) params.d = `group:${grp.id}`
+      else if (owner && isFile) { params.file = resolved; delete params.line }
+      else {
+        a.href = isFile ? M.github(resolved) : M.githubTree(resolved)
+        a.target = '_blank'; a.rel = 'noopener'; a.title = resolved
+        return
+      }
+      a.href = router.href(view, params)
       a.addEventListener('click', e => {
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
         e.preventDefault()
-        if (M.docById.has(resolved)) { DSHMap.nav.openDoc(`${resolved}${frag ? `#${frag}` : ''}`); return }
-        const pkg = M.packages.find(p => resolved === `${p.dir}/README.md` || resolved === p.dir || resolved === `${p.dir}/`)
-        if (pkg) { DSHMap.nav.openPackage(pkg.id); return }
-        const grp = M.groups.find(g => resolved === `${g.path}/README.md`)
-        if (grp) { DSHMap.nav.openGroup(grp.id); return }
-        const owner = M.pkgOfPath(resolved)
-        if (owner && /\.[a-z0-9]+$/i.test(resolved)) { DSHMap.nav.openFile(resolved); return }
-        window.open(/\.[a-z0-9]+$/i.test(resolved) ? M.github(resolved) : M.githubTree(resolved), '_blank', 'noopener')
+        router.go(view, params)
       })
       a.title = resolved
     },

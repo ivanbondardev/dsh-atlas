@@ -63,7 +63,7 @@
       page.appendChild(profRow)
 
       page.appendChild(h('h2', { class: 'section-title' }, t('ov.turn'), h('span', { class: 'hint' }, t('ov.turn.hint'))))
-      page.appendChild(turnFlow())
+      page.appendChild(DSHMap.ui.turnFlow())
 
       // concepts
       page.appendChild(h('h2', { class: 'section-title' }, t('ov.concepts')))
@@ -109,26 +109,4 @@
     return h('a', { class: 'kpi', href }, h('b', null, fmt.num(value)), h('span', null, label))
   }
 
-  function turnFlow() {
-    const M = DSHMap.model
-    const wrap = h('div', { class: 'flow' })
-    for (const step of M.overview.turnFlow) {
-      const ev = step.log ? M.seByName.get(step.name) : M.evByName.get(step.name)
-      if (!ev) continue
-      const sub = step.log
-        ? t('ov.sessionLog')
-        : `${ev.mode} · ${ev.listeners.length} ${t(`n.listeners.${fmt.plural(ev.listeners.length, { one: 'one', few: 'few', many: 'many', other: 'other' })}`)}`
-      wrap.appendChild(h('button', {
-        class: ['flow-step', step.log ? 'fs-log' : 'fs-live'],
-        title: util.firstSentence(ev.description ?? '', 240),
-        onclick: () => (step.log ? DSHMap.nav.openSessionEvent(step.name) : DSHMap.nav.openEvent(step.name)),
-      },
-      h('div', { class: 'k' }, step.log ? 'log' : 'live'),
-      h('b', null, step.name),
-      h('span', null, step.text ? i18n.pick(step.text) : sub),
-      step.text ? h('div', { class: 'faint tiny flow-sub' }, sub) : null))
-    }
-    return wrap
-  }
-  DSHMap.ui.turnFlow = turnFlow
 })()

@@ -469,7 +469,6 @@
         layout: { name: 'preset' },
         minZoom: 0.04,
         maxZoom: 5,
-        wheelSensitivity: 0.3,
         boxSelectionEnabled: false,
         selectionType: 'single',
         pixelRatio: 'auto',
